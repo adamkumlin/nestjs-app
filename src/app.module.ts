@@ -6,13 +6,13 @@ import { UserSchema } from './user/schemas/user.schema';
 
 @Module({
   imports: [
+    MongooseModule.forRoot(
+      // `mongodb://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@localhost:27017`,
+      "mongodb://localhost/nestjs",
+      // { dbName: 'nestusers' },
+    ),
     AuthModule,
     UserModule,
-    MongooseModule.forRoot(
-      `mongodb://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@localhost:27017`,
-      { dbName: 'nestusers' },
-    ),
-    MongooseModule.forFeature([{name: "User", schema: UserSchema}]),
   ],
 })
 export class AppModule {}

@@ -3,18 +3,17 @@ import { InjectConnection, InjectModel } from "@nestjs/mongoose";
 import { User } from "./schemas/user.schema";
 import { Connection, Model } from "mongoose";
 import { CreateUserDto } from "./dto/create-user.dto";
-import { IUser } from "./interface/user.interface";
 
 @Injectable({})
 export class UserService {
     constructor(@InjectModel(User.name) private userModel: Model<User>, @InjectConnection() private connection: Connection) {}
 
-    async create(createUserDto: CreateUserDto): Promise<IUser> {
+    async create(createUserDto: CreateUserDto): Promise<User> {
         const createdUser = new this.userModel(createUserDto);
         return createdUser.save();
     }
 
-    async get(id: string): Promise<IUser> {
+    async get(id: string): Promise<User> {
         const existingUser = await this.userModel.findById(id).exec();
 
         if (!existingUser) {
@@ -23,7 +22,7 @@ export class UserService {
         return existingUser;
     }
 
-    async getAll(): Promise<IUser[]> {
+    async getAll(): Promise<User[]> {
         return await this.userModel.find().exec();
     }
 
