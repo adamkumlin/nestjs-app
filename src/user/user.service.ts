@@ -1,33 +1,47 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { InjectConnection, InjectModel } from "@nestjs/mongoose";
-import { User } from "./schemas/user.schema";
-import { Connection, Model } from "mongoose";
-import { CreateUserDto } from "./dto/create-user.dto";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from './schemas/user.schema';
+import { Model } from 'mongoose';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable({})
 export class UserService {
-    constructor(@InjectModel(User.name) private userModel: Model<User>, @InjectConnection() private connection: Connection) {}
+  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-    async create(createUserDto: CreateUserDto): Promise<User> {
-        const createdUser = new this.userModel(createUserDto);
-        return createdUser.save();
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const createdUser = new this.userModel(createUserDto);
+    return createdUser.save();
+  }
+
+  // Get user by name
+  async get(name: string): Promise<User> {
+    const existingUser = await findUserByName(name);
+
+    if (!existingUser) {
+      throw new NotFoundException('User not found.');
     }
+    return existingUser;
+  }
 
-    async get(id: string): Promise<User> {
-        const existingUser = await this.userModel.findById(id).exec();
+  async getAll(): Promise<User[]> {
+    return await this.userModel.find().exec();
+  }
 
-        if (!existingUser) {
-            throw new NotFoundException("User not found.")
-        }
-        return existingUser;
+  // Delete user by name
+  async delete(name: string) {
+    const userToDelete = await this.userModel
+      .findOneAndDelete({ name: name })
+      .exec();
+
+    if (!userToDelete) {
+      return new NotFoundException('User not found.');
     }
+    return userToDelete;
+  }
 
-    async getAll(): Promise<User[]> {
-        return await this.userModel.find().exec();
-    }
+}
 
-    async delete(id: string) {
-        const catToDelete = await this.userModel.findOneAndDelete({_id: id}).exec();
-        return catToDelete;
-    }
+async function findUserByName(name: string): Promise<User> {
+  const existingUser = await this.userModel.findOne({ name: name }).exec();
+  return existingUser;
 }

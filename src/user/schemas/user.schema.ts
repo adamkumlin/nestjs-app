@@ -18,7 +18,7 @@ export class User {
   profileImage: string;
 
   @Prop({ required: true })
-  joinDate: Date;
+  joinDate: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

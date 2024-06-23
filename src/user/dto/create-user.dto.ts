@@ -1,5 +1,6 @@
 import {
   IsDate,
+  IsDateString,
   IsEmail,
   IsLowercase,
   IsNotEmpty,
@@ -26,7 +27,7 @@ export class CreateUserDto {
 
   profileImage?: string;
 
-  @IsDate()
   @IsNotEmpty()
-  joinDate: Date;
+  @IsDateString()
+  joinDate: string;
 }
