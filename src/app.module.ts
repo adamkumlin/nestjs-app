@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
+import { UsersModule } from './users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 
@@ -10,8 +9,7 @@ import { ConfigModule } from '@nestjs/config';
     MongooseModule.forRoot(process.env.DB_CONNECTION_STRING, {
       dbName: 'NestUsers',
     }),
-    AuthModule,
-    UserModule,
+    UsersModule,
   ],
 })
 export class AppModule {}
