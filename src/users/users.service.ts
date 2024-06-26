@@ -17,8 +17,8 @@ export class UsersService {
     const createdUser = new this.usersModel(createUserDto);
 
     if (
-      await this.getUserByName(createdUser.name) ||
-      await this.getUserByEmail(createUserDto.email)
+      (await this.getUserByName(createdUser.name)) ||
+      (await this.getUserByEmail(createUserDto.email))
     ) {
       throw new ConflictException('Username or email is already in use.');
     }
@@ -39,7 +39,8 @@ export class UsersService {
     return await this.usersModel.find().exec();
   }
 
-  async update(updateUserDto: UpdateUserDto): Promise<User> {
+  async update(name: string, updateUserDto: UpdateUserDto): Promise<User> {
+    // Get the user
     const updatedUser = new this.usersModel(updateUserDto);
 
     if (
@@ -49,7 +50,8 @@ export class UsersService {
       throw new ConflictException('Username or email is already in use.');
     }
 
-    return updatedUser;
+    // Find by name and update
+    return this.usersModel.findOneAndUpdate({ name: name }, updateUserDto).exec();
   }
 
   // Delete user by name
