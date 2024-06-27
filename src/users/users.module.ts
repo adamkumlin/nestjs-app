@@ -8,7 +8,7 @@ import { UsersController } from "./users.controller";
     imports: [MongooseModule.forFeature([{name: User.name, schema: UserSchema}])],
     controllers: [UsersController],
     providers: [UsersService],
-    exports: [MongooseModule]
+    exports: [MongooseModule] // To be able to import UsersModel in middleware
 })
 
 export class UsersModule {}

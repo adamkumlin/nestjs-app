@@ -1,22 +1,31 @@
-import { Injectable, NestMiddleware, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NestMiddleware,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { NextFunction, Request, Response } from 'express';
 import { Model } from 'mongoose';
 import { User } from 'src/users/schemas/user.schema';
 
 @Injectable()
-export class ValidationMiddleware implements NestMiddleware {
+export class RequestBodyValidationMiddleware implements NestMiddleware {
+  // Inject UserModel to be able to query the collection
   constructor(@InjectModel(User.name) private usersModel: Model<User>) {}
 
-  use(req: Request, res: Response, next: NextFunction) {
+  async use(req: Request, res: Response, next: NextFunction) {
+    if (req.body) {
+      const requestBody = JSON.stringify(req.body);
+      const bodyObject = JSON.parse(requestBody);
 
-    // Get the path excluding the initial forward slash
-    const requestPath = req.path.slice(1);
-
-    console.log(requestPath)
-    if (!this.getUserByName(requestPath)) {
-      return new NotFoundException('User not found.');
+      if (
+        (await this.getUserByName(bodyObject.name)) ||
+        (await this.getUserByEmail(bodyObject.email))
+      ) {
+        throw new ConflictException('Username or email is already in use.');
+      }
     }
+
     next();
   }
 

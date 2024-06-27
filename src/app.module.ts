@@ -1,8 +1,15 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
-import { ValidationMiddleware } from './middleware/validation.middleware';
+import { UserValidationMiddleware } from './middleware/user-validation.middleware';
+import { RequestBodyValidationMiddleware } from './middleware/request-body-validation.middleware';
+import { UsersController } from './users/users.controller';
 
 @Module({
   imports: [
@@ -15,6 +22,18 @@ import { ValidationMiddleware } from './middleware/validation.middleware';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(ValidationMiddleware).forRoutes('users');
+    // Apply to all requests with path "users/<user>"
+    consumer
+      .apply(UserValidationMiddleware)
+      .forRoutes({ path: 'users/*', method: RequestMethod.ALL });
+
+    // Excludes GET requests
+    consumer
+      .apply(RequestBodyValidationMiddleware)
+      .exclude({
+        path: 'users/*',
+        method: RequestMethod.GET,
+      })
+      .forRoutes(UsersController);
   }
 }
